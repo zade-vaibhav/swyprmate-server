@@ -76,35 +76,50 @@ async function user_login(req, res) {
 async function user_regiser(req, res) {
 
     let { name, email, password } = req.body;
-  console.log("hello")
+    
     name = name.trim();
     email = email.trim();
     password = password.trim();
 
     if (name == "" || email == "" || password == "") {
 
-        res.status(404).json({
-            status: "FAILED",
-            massage: "empty Input feilds!"
-        })
+        res.json({
+            status: "error",
+            error: {
+              code: "400",
+              message: "empty Input feilds!"
+            }
+          })
+
     } else if (!/^[a-zA-Z ]*$/.test(name)) {
 
-        res.status(404).json({
-            status: "FAILED",
-            massage: "invalid name entered!"
-        })
+        res.json({
+            status: "error",
+            error: {
+              code: "400",
+              message: "invalid name entered!"
+            }
+          })
+
     } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
 
-        res.status(404).json({
-            status: "FAILED",
-            massage: "Invalid email entered!"
-        })
-    } else if (password.length < 8) {
+        res.json({
+            status: "error",
+            error: {
+              code: "400",
+              message: "Invalid email entered!"
+            }
+          })
 
-        res.status(404).json({
-            status: "FAILED",
-            massage: "Pasword is too short!"
-        })
+    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password)) {
+
+        res.json({
+            status: "error",
+            error: {
+              code: "400",
+              message: "Invalid password format"
+            }
+          })
     } else {
 
         //send to database
@@ -124,6 +139,7 @@ async function user_regiser(req, res) {
                         const ans = await ownerEmailverification.findOneAndDelete({ _id: hasOtp[0]._id })
 
                         // creating new email document in model
+                        //creating otp
                         const otp = String(parseInt(uuidv4().slice(0, 7), 16) % 900000 + 100000);
                         //hash otp
                         let salt = 10;
@@ -143,26 +159,31 @@ async function user_regiser(req, res) {
                             // sending otp to new user and saving new hashed otp value in database
                             await newEmailVerify.save();
 
-                            res.status(406).json({
-                                status: "FAILED",
-                                massage: "users already present but email is not varified. email is sent to your given eamil"
-                            })
+                            res.json({
+                                    status: "success",
+                                    message: "users already present but email is not varified. email is sent to your given eamil"
+                                 })
 
                         } else {
 
-                            res.status(400).json({
-                                status: "FAILED",
-                                massage: "Trouble sending email"
-                            })
-
+                            res.json({
+                                status: "error",
+                                error: {
+                                  code: "400",
+                                  message: "Trouble sending email!"
+                                }
+                              })
                         }
 
                     } else {
 
                         res.status(406).json({
-                            status: "FAILED",
-                            massage: "users already present but email is not varified. we already sent you otp for this session make sure session has expire for next otp"
-                        })
+                            status: "error",
+                            error: {
+                              code: "400",
+                              message: "OTP already sent, session yet to expire"
+                            }
+                          })
                     }
 
                 } else {
@@ -187,26 +208,34 @@ async function user_regiser(req, res) {
                         // sending otp to new user and saving new hashed otp value in database
                         await newEmailVerify.save();
 
-                        res.status(406).json({
-                            status: "FAILED",
-                            massage: "users already present but email is not varified. email is sent to your given eamil"
-                        })
+                        res.json({
+                            status: "success",
+                            message: "users already present but email is not varified. email is sent to your given eamil"
+                         })
+
                     } else {
 
-                        res.status(400).json({
-                            status: "FAILED",
-                            massage: "users already present but email is not varified. Trouble sending email"
-                        })
+                        res.json({
+                            status: "error",
+                            error: {
+                              code: "400",
+                              message: "Trouble sending email!"
+                            }
+                          })
 
                     }
 
                 }
 
             } else {
-                res.status(406).json({
-                    status: "FAILED",
-                    massage: "users already present!"
-                })
+
+                res.json({
+                    status: "error",
+                    error: {
+                      code: "401",
+                      message: "users already present! kindly login"
+                    }
+                  })
             }
         } else {
 
@@ -244,17 +273,20 @@ async function user_regiser(req, res) {
                 //sending otp to new user and saving new hash ot p value in database
                 await newEmailVerify.save();
 
-                res.status(200).json({
-                    status: "SUCESS",
-                    massage: "sucessfully created"
-                })
+                res.json({
+                    status: "success",
+                    message: "successfully user created"
+                  })
 
             } else {
 
-                res.status(400).json({
-                    status: "Failed",
-                    massage: "email not sent"
-                })
+                res.json({
+                    status: "error",
+                    error: {
+                      code: "400",
+                      message: "Trouble sending email!"
+                    }
+                  })
             }
 
 
