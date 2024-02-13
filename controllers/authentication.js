@@ -76,7 +76,7 @@ async function user_login(req, res) {
 async function user_regiser(req, res) {
 
     let { name, email, password } = req.body;
-    
+
     name = name.trim();
     email = email.trim();
     password = password.trim();
@@ -161,6 +161,10 @@ async function user_regiser(req, res) {
 
                             res.json({
                                     status: "success",
+                                    user: {
+                                        id:isUser[0]._id,
+                                       
+                                      },
                                     message: "users already present but email is not varified. email is sent to your given eamil"
                                  })
 
@@ -177,7 +181,7 @@ async function user_regiser(req, res) {
 
                     } else {
 
-                        res.status(406).json({
+                        res.json({
                             status: "error",
                             error: {
                               code: "400",
@@ -210,6 +214,10 @@ async function user_regiser(req, res) {
 
                         res.json({
                             status: "success",
+                            user: {
+                                id:isUser[0]._id,
+                               
+                              },
                             message: "users already present but email is not varified. email is sent to your given eamil"
                          })
 
@@ -275,6 +283,10 @@ async function user_regiser(req, res) {
 
                 res.json({
                     status: "success",
+                    user: {
+                        id:userData._id,
+                       
+                      },
                     message: "successfully user created"
                   })
 
@@ -305,10 +317,13 @@ async function email_varification(req, res) {
 
             if(isUser[0].date_expires < Date.now()){
 
-                res.status(400).json({
-                    status: "FAILED",
-                    massage: "Session Timeout!"
-                })
+                res.json({
+                    status: "error",
+                    error: {
+                      code: "404",
+                      message: "Session Timeout!!"
+                    }
+                  })
             }else{
 
                 const same = await bcrypt.compare(otp, isUser[0].otp)
@@ -320,27 +335,43 @@ async function email_varification(req, res) {
                     // delete otp document from model
                     await ownerEmailverification.findOneAndDelete({ owner: id })
 
-                    res.status(200).json({
-                        status: "SUCCESS",
+                    res.json({
+                        status: "success",
                         data:update,
                         massage: "user is varified"
                     })
+
+                   
                 } else {
 
-                    res.status(400).json({
-                        status: "FAILED",
-                        massage: "invalid OTP!"
-                    })
+                    res.json({
+                        status: "error",
+                        error: {
+                          code: "400",
+                          message: "invalid OTP!"
+                        }
+                      })
                 }
 
             }
            
+        }else{
+            res.json({
+                status: "error",
+                error: {
+                  code: "400",
+                  message: "invalid request!"
+                }
+              })
         }
     } catch (err) {
-        res.status(404).json({
-            status: "FAILED",
-            massage: err
-        })
+        res.json({
+            status: "error",
+            error: {
+              code: "400",
+              message: "server error!"
+            }
+          })
     }
 
 
