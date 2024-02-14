@@ -17,9 +17,13 @@ async function user_login(req, res) {
     if (email == "" || password == "") {
 
         res.status(404).json({
-            status: "FAILED",
-            massage: "Empty credentials!"
-        })
+            status: "error",
+            error: {
+                code: "401",
+                message: "empty credentials"
+            }
+        }
+        )
     } else {
 
         const isUser = await user.find({ email });
@@ -30,39 +34,54 @@ async function user_login(req, res) {
 
             if (isUser[0].email == email) {
                 if (check_password) {
-                    
+
                     // create token of user credentials
-                    const token = jwt.sign({user:isUser[0]},process.env.SECTRT_KEY,{ expiresIn: '1h' });
+                    const token = jwt.sign({ user: isUser[0] }, process.env.SECTRT_KEY, { expiresIn: '1h' });
 
                     // sending token in cookies
                     res.cookie('token', token, { httpOnly: true, secure: false })
-                    res.status(200).json({
-                        status: "SUCCESS",
-                        data:token,
-                        massage: "Login successfull."
+
+                    res.json({
+                        status: "success",
+                        user: {
+                            token: token
+                        },
+                        message: "Login successfull."
                     })
 
                 } else {
 
-                    res.status(400).json({
-                        status: "FAILED",
-                        massage: "Invalid credentials!"
-                    })
+                    res.json({
+                        status: "error",
+                        error: {
+                            code: "401",
+                            message: "Invalid credentials"
+                        }
+                    }
+                    )
 
                 }
             } else {
 
-                res.status(400).json({
-                    status: "FAILED",
-                    massage: "Invalid credentials!"
-                })
+                res.json({
+                    status: "error",
+                    error: {
+                        code: "401",
+                        message: "Invalid credentials"
+                    }
+                }
+                )
             }
-            
+
         } else {
-            res.status(400).json({
-                status: "FAILED",
-                massage: "Invalid User!!"
-            })
+            res.json({
+                status: "error",
+                error: {
+                    code: "401",
+                    message: "Invalid user!!"
+                }
+            }
+            )
 
         }
 
@@ -86,40 +105,40 @@ async function user_regiser(req, res) {
         res.json({
             status: "error",
             error: {
-              code: "400",
-              message: "empty Input feilds!"
+                code: "400",
+                message: "empty Input feilds!"
             }
-          })
+        })
 
     } else if (!/^[a-zA-Z ]*$/.test(name)) {
 
         res.json({
             status: "error",
             error: {
-              code: "400",
-              message: "invalid name entered!"
+                code: "400",
+                message: "invalid name entered!"
             }
-          })
+        })
 
     } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
 
         res.json({
             status: "error",
             error: {
-              code: "400",
-              message: "Invalid email entered!"
+                code: "400",
+                message: "Invalid email entered!"
             }
-          })
+        })
 
     } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password)) {
 
         res.json({
             status: "error",
             error: {
-              code: "400",
-              message: "Invalid password format"
+                code: "400",
+                message: "Invalid password format"
             }
-          })
+        })
     } else {
 
         //send to database
@@ -160,23 +179,23 @@ async function user_regiser(req, res) {
                             await newEmailVerify.save();
 
                             res.json({
-                                    status: "success",
-                                    user: {
-                                        id:isUser[0]._id,
-                                       
-                                      },
-                                    message: "users already present but email is not varified. email is sent to your given eamil"
-                                 })
+                                status: "success",
+                                user: {
+                                    id: isUser[0]._id,
+
+                                },
+                                message: "users already present but email is not varified. email is sent to your given eamil"
+                            })
 
                         } else {
 
                             res.json({
                                 status: "error",
                                 error: {
-                                  code: "400",
-                                  message: "Trouble sending email!"
+                                    code: "400",
+                                    message: "Trouble sending email!"
                                 }
-                              })
+                            })
                         }
 
                     } else {
@@ -184,10 +203,10 @@ async function user_regiser(req, res) {
                         res.json({
                             status: "error",
                             error: {
-                              code: "400",
-                              message: "OTP already sent, session yet to expire"
+                                code: "400",
+                                message: "OTP already sent, session yet to expire"
                             }
-                          })
+                        })
                     }
 
                 } else {
@@ -215,21 +234,21 @@ async function user_regiser(req, res) {
                         res.json({
                             status: "success",
                             user: {
-                                id:isUser[0]._id,
-                               
-                              },
+                                id: isUser[0]._id,
+
+                            },
                             message: "users already present but email is not varified. email is sent to your given eamil"
-                         })
+                        })
 
                     } else {
 
                         res.json({
                             status: "error",
                             error: {
-                              code: "400",
-                              message: "Trouble sending email!"
+                                code: "400",
+                                message: "Trouble sending email!"
                             }
-                          })
+                        })
 
                     }
 
@@ -240,10 +259,10 @@ async function user_regiser(req, res) {
                 res.json({
                     status: "error",
                     error: {
-                      code: "401",
-                      message: "users already present! kindly login"
+                        code: "401",
+                        message: "users already present! kindly login"
                     }
-                  })
+                })
             }
         } else {
 
@@ -277,28 +296,28 @@ async function user_regiser(req, res) {
                     date_expires: Date.now() + 120000,
 
                 })
- 
+
                 //sending otp to new user and saving new hash ot p value in database
                 await newEmailVerify.save();
 
                 res.json({
                     status: "success",
                     user: {
-                        id:userData._id,
-                       
-                      },
+                        id: userData._id,
+
+                    },
                     message: "successfully user created"
-                  })
+                })
 
             } else {
 
                 res.json({
                     status: "error",
                     error: {
-                      code: "400",
-                      message: "Trouble sending email!"
+                        code: "400",
+                        message: "Trouble sending email!"
                     }
-                  })
+                })
             }
 
 
@@ -312,66 +331,66 @@ async function email_varification(req, res) {
     const otp = req.body.otp
     try {
         const isUser = await ownerEmailverification.find({ owner: id })
-       
+
         if (isUser.length) {
 
-            if(isUser[0].date_expires < Date.now()){
+            if (isUser[0].date_expires < Date.now()) {
 
                 res.json({
                     status: "error",
                     error: {
-                      code: "404",
-                      message: "Session Timeout!!"
+                        code: "404",
+                        message: "Session Timeout!!"
                     }
-                  })
-            }else{
+                })
+            } else {
 
                 const same = await bcrypt.compare(otp, isUser[0].otp)
                 if (same) {
 
                     // update user is verify
-                    const update = await user.findOneAndUpdate({ _id: id }, { $set: { is_varified: true } },{new:true});
+                    const update = await user.findOneAndUpdate({ _id: id }, { $set: { is_varified: true } }, { new: true });
 
                     // delete otp document from model
                     await ownerEmailverification.findOneAndDelete({ owner: id })
 
                     res.json({
                         status: "success",
-                        data:update,
+                        data: update,
                         massage: "user is varified"
                     })
 
-                   
+
                 } else {
 
                     res.json({
                         status: "error",
                         error: {
-                          code: "400",
-                          message: "invalid OTP!"
+                            code: "400",
+                            message: "invalid OTP!"
                         }
-                      })
+                    })
                 }
 
             }
-           
-        }else{
+
+        } else {
             res.json({
                 status: "error",
                 error: {
-                  code: "400",
-                  message: "invalid request!"
+                    code: "400",
+                    message: "invalid request!"
                 }
-              })
+            })
         }
     } catch (err) {
         res.json({
             status: "error",
             error: {
-              code: "400",
-              message: "server error!"
+                code: "400",
+                message: "server error! "+err
             }
-          })
+        })
     }
 
 

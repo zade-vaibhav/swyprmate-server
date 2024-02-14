@@ -40,26 +40,34 @@ async function reset_password_otp(req,res){
                         // sending otp to new user and saving new hashed otp value in database
                         await passwordEmailVerify.save();
 
-                        res.status(406).json({
-                            status: "SUCCESS",
-                            data:isUser[0]._id,
+                        res.json({
+                            status: "success",
+                            data:{
+                                id:isUser[0]._id
+                            },
                             massage: "otp is sent to your given eamil successfully"
                         })
 
                     } else {
 
-                        res.status(400).json({
-                            status: "FAILED",
-                            massage: "Trouble sending email"
+                        res.json({
+                            status: "error",
+                            error: {
+                                code: "400",
+                                message: "Trouble sending email!"
+                            }
                         })
 
                     }
 
                 } else {
 
-                    res.status(406).json({
-                        status: "FAILED",
-                        massage: "users already present but email is not varified. we already sent you otp for this session make sure session has expire for next otp"
+                    res.json({
+                        status: "error",
+                        error: {
+                            code: "400",
+                            message: "OTP already sent, session yet to expire"
+                        }
                     })
                 }
             
@@ -89,35 +97,46 @@ async function reset_password_otp(req,res){
             // sending otp to user for creating new password
             await passwordEmailVerify.save();
 
-            res.status(406).json({
-                status: "SUCCESS",
-                data:isUser[0]._id,
+            res.json({
+                status: "success",
+                data:{
+                    id:isUser[0]._id
+                },
                 massage: "otp sent for resseting password success fully"
             })
 
         }else{
 
-            res.status(400).json({
-                status: "FAILED",
-                massage: "Trouble sending email"
+            res.json({
+                status: "error",
+                error: {
+                    code: "400",
+                    message: "Trouble sending email!"
+                }
             })
 
         }
     }
         }else{
 
-            res.status(404).json({
-                status: "FAILED",
-                massage: "user not found"
+            res.json({
+                status: "error",
+                error: {
+                    code: "400",
+                    message: "invalid user!"
+                }
             })
 
         }
     }catch(err){
 
-        res.status(404).json({
-            status: "FAILED",
-                massage:err
-           })
+        res.json({
+            status: "error",
+            error: {
+                code: "400",
+                message:err
+            }
+        })
 
     }   
 
@@ -136,9 +155,12 @@ async function password_verification(req,res){
 
             if(isUser[0].date_expires < Date.now()){
 
-                res.status(400).json({
-                    status: "FAILED",
-                    massage: "Session Timeout!"
+                res.json({
+                    status: "error",
+                    error: {
+                        code: "404",
+                        message: "Session Timeout!!"
+                    }
                 })
             }else{
                 console.log("otp",otp)
@@ -147,26 +169,43 @@ async function password_verification(req,res){
                     // delete otp document from model
                     await passwordEmailverification.findOneAndDelete({ owner: id })
 
-                    res.status(200).json({
-                        status: "SUCCESS",
-                        data:{user_Id:id},
+                    res.json({
+                        status: "success",
+                        data:{
+                            id:id},
                         massage: "email is varified"
                     })
                 } else {
 
-                    res.status(400).json({
-                        status: "FAILED",
-                        massage: "invalid OTP!"
+                    res.json({
+                        status: "error",
+                        error: {
+                            code: "400",
+                            message: "invalid OTP!"
+                        }
                     })
                 }
 
             }
            
+        }else{
+
+            res.json({
+                status: "error",
+                error: {
+                    code: "400",
+                    message: "invalid request!"
+                }
+            })
         }
     } catch (err) {
-        res.status(404).json({
-            status: "FAILED",
-            massage: err
+
+        res.json({
+            status: "error",
+            error: {
+                code: "400",
+                message: "server error! "+err
+            }
         })
     }
 
@@ -177,7 +216,38 @@ async function password_verification(req,res){
 // update password
 
 async function updatePassword(req,res){
-console.log(req.body.password)
+    const { id } = req.params
+let {password} =req.body;
+
+
+if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password)) {
+
+    res.json({
+        status: "error",
+        error: {
+            code: "400",
+            message: "Invalid password format"
+        }
+    })
+}else{
+
+    const responce=await user.findByIdAndUpdate({_id:id},{$set:{password:password}},{new:true})
+    if(responce){
+        res.json({
+            status: "success",
+            message: "password update successfull."
+        })
+    }else{
+
+        res.json({
+            status: "error",
+            error: {
+                code: "404",
+                message: "Trouble updating password!!"
+            }
+    })
+    }
+}
 
 }
 

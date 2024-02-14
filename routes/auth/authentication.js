@@ -27,7 +27,7 @@ router.post("/password/password_reset_verify",reset_password_otp)
 router.post("/password/verify/:id",password_verification)
 
 //password change
-router.post("/password/update_password",updatePassword)
+router.post("/password/update_password/:id",updatePassword)
 
 
 
