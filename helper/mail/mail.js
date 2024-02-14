@@ -18,7 +18,7 @@ const mail = async (email, name, otp) => {
         to: `${email}`,
         subject: "Swypemate",
         text: "",
-        html: `<span><h3>${name}</h3> this is your one-time OTP for Emai-Verification by Swypemate</span><h4>${otp}</h4><p>This OTP is only valid for 2 min</p>`
+        html: `<span><h3>${name}</h3> this is your one-time OTP for Emai-Verification by Swypemate</span><h4>${otp}</h4><p>This OTP is only valid for 10 min</p>`
     }
 
     return await transporter.sendMail(mailOption)
@@ -44,7 +44,7 @@ const reset_password_mail = async (email, name, otp) => {
         to: `${email}`,
         subject: "Swypemate",
         text: "",
-        html: `<span><h3>${name}</h3> this is your one-time OTP to reset-password by Swypemate</span><h4>${otp}</h4><p>This OTP is only valid for 2 min</p>`
+        html: `<span><h3>${name}</h3> this is your one-time OTP to reset-password by Swypemate</span><h4>${otp}</h4><p>This OTP is only valid for 10 min</p>`
     }
 
     return await transporter.sendMail(mailOption)

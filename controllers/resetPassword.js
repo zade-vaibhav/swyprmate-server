@@ -2,6 +2,7 @@ const {reset_password_mail}=require("../helper/mail/mail");
 const {user,passwordEmailverification}=require("../models/users")
 const { v4: uuidv4 } = require("uuid")
 const bcrypt=require("bcrypt")
+const {idToToken, userToToken, verifyId} = require("../helper/token/token");
 
 async function reset_password_otp(req,res){
 
@@ -40,10 +41,13 @@ async function reset_password_otp(req,res){
                         // sending otp to new user and saving new hashed otp value in database
                         await passwordEmailVerify.save();
 
+                         // create token of user credentials
+                    const token=idToToken(isUser[0].id)
+
                         res.json({
                             status: "success",
                             data:{
-                                id:isUser[0]._id
+                                id:token
                             },
                             massage: "otp is sent to your given eamil successfully"
                         })
@@ -97,10 +101,13 @@ async function reset_password_otp(req,res){
             // sending otp to user for creating new password
             await passwordEmailVerify.save();
 
+             // create token of user credentials
+             const token=userToToken(isUser[0]._id)
+
             res.json({
                 status: "success",
                 data:{
-                    id:isUser[0]._id
+                    id:token
                 },
                 massage: "otp sent for resseting password success fully"
             })
@@ -146,10 +153,12 @@ async function reset_password_otp(req,res){
 // password_verification 
 
 async function password_verification(req,res){
-    const { id } = req.params
+    const { token } = req.params
     const otp = req.body.otp
     try {
-        const isUser = await passwordEmailverification.find({ owner: id })
+        // verify token
+        const tokenData=await verifyId(token)
+        const isUser = await passwordEmailverification.find({ owner: tokenData.user })
        
         if (isUser.length) {
 
@@ -163,16 +172,18 @@ async function password_verification(req,res){
                     }
                 })
             }else{
-                console.log("otp",otp)
                 const same = await bcrypt.compare(otp, isUser[0].otp)
                 if (same) {
+     
+
                     // delete otp document from model
-                    await passwordEmailverification.findOneAndDelete({ owner: id })
+                    await passwordEmailverification.findOneAndDelete({ owner: tokenData.user})
 
                     res.json({
                         status: "success",
                         data:{
-                            id:id},
+                            id:token
+                        },
                         massage: "email is varified"
                     })
                 } else {
@@ -216,8 +227,8 @@ async function password_verification(req,res){
 // update password
 
 async function updatePassword(req,res){
-    const { id } = req.params
-let {password} =req.body;
+    const { token } = req.params
+let password =req.body.password;
 
 
 if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password)) {
@@ -230,10 +241,14 @@ if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password)) {
         }
     })
 }else{
+
+    // encrypt password
     const salt=10;
     const hashedPassword=await bcrypt.hash(password,salt)
 
-    const responce=await user.findByIdAndUpdate({_id:id},{$set:{password:hashedPassword}},{new:true})
+    //getting id from token
+    const tokenData=await verifyId(token)
+    const responce=await user.findByIdAndUpdate({_id:tokenData.user},{$set:{password:hashedPassword}},{new:true})
     if(responce){
         res.json({
             status: "success",
@@ -253,4 +268,4 @@ if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password)) {
 
 }
 
-module.exports={reset_password_otp,password_verification,updatePassword};
+module.exports={reset_password_otp,password_verification,updatePassword}; 

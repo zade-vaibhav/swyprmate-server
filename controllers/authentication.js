@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require("uuid")
 const jwt = require("jsonwebtoken");
 const { user, ownerEmailverification } = require("../models/users");
 const { mail } = require("../helper/mail/mail");
+const {idToToken, userToToken, verifyId} = require("../helper/token/token");
 require('dotenv').config()
 
 
@@ -36,8 +37,8 @@ async function user_login(req, res) {
                 if (check_password) {
 
                     // create token of user credentials
-                    const token = jwt.sign({ user: isUser[0] }, process.env.SECTRT_KEY, { expiresIn: '1h' });
-
+                    const token=userToToken(isUser[0])
+                
                     // sending token in cookies
                     res.cookie('token', token, { httpOnly: true, secure: false })
 
@@ -178,13 +179,16 @@ async function user_regiser(req, res) {
                             // sending otp to new user and saving new hashed otp value in database
                             await newEmailVerify.save();
 
+                            // creating token
+                            const token=idToToken(isUser[0]._id)
+
                             res.json({
                                 status: "success",
                                 user: {
-                                    id: isUser[0]._id,
+                                    id: token,
 
                                 },
-                                message: "users already present but email is not varified. email is sent to your given eamil"
+                                message: "email is sent to your given eamil"
                             })
 
                         } else {
@@ -231,10 +235,13 @@ async function user_regiser(req, res) {
                         // sending otp to new user and saving new hashed otp value in database
                         await newEmailVerify.save();
 
+                         // creating token
+                         const token=idToToken(isUser[0]._id)
+
                         res.json({
                             status: "success",
                             user: {
-                                id: isUser[0]._id,
+                                id: token,
 
                             },
                             message: "users already present but email is not varified. email is sent to your given eamil"
@@ -300,10 +307,13 @@ async function user_regiser(req, res) {
                 //sending otp to new user and saving new hash ot p value in database
                 await newEmailVerify.save();
 
+                 // creating token
+                 const token=idToToken(userData._id)
+
                 res.json({
                     status: "success",
                     user: {
-                        id: userData._id,
+                        id: token,
 
                     },
                     message: "successfully user created"
@@ -327,10 +337,13 @@ async function user_regiser(req, res) {
 }
 
 async function email_varification(req, res) {
-    const { id } = req.params
+    const { token } = req.params
     const otp = req.body.otp
     try {
-        const isUser = await ownerEmailverification.find({ owner: id })
+
+        const tokenData=await verifyId(token)
+        
+        const isUser = await ownerEmailverification.find({ owner: tokenData.user })
 
         if (isUser.length) {
 
@@ -349,14 +362,13 @@ async function email_varification(req, res) {
                 if (same) {
 
                     // update user is verify
-                    const update = await user.findOneAndUpdate({ _id: id }, { $set: { is_varified: true } }, { new: true });
+                    const update = await user.findOneAndUpdate({ _id: tokenData.user }, { $set: { is_varified: true } }, { new: true });
 
                     // delete otp document from model
-                    await ownerEmailverification.findOneAndDelete({ owner: id })
+                    await ownerEmailverification.findOneAndDelete({ owner: tokenData.user })
 
                     res.json({
                         status: "success",
-                        data: update,
                         massage: "user is varified"
                     })
 
@@ -388,7 +400,7 @@ async function email_varification(req, res) {
             status: "error",
             error: {
                 code: "400",
-                message: "server error! "+err
+                message: "server error!"
             }
         })
     }
