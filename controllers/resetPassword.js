@@ -230,8 +230,10 @@ if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password)) {
         }
     })
 }else{
+    const salt=10;
+    const hashedPassword=await bcrypt.hash(password,salt)
 
-    const responce=await user.findByIdAndUpdate({_id:id},{$set:{password:password}},{new:true})
+    const responce=await user.findByIdAndUpdate({_id:id},{$set:{password:hashedPassword}},{new:true})
     if(responce){
         res.json({
             status: "success",
