@@ -5,11 +5,6 @@ const router = express.Router();
 const {user}=require("../../models/users")
 
 
-router.get("/",async(req,res)=>{ 
-   console.log("dklsdjk")
-   const ans= await user.find({_id:"65ca15457a7ea9a89d089c8c"})
-   res.json({massage:ans})
-})
 
 //login
 router.post("/login",user_login)
