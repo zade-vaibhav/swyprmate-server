@@ -2,8 +2,8 @@ const bcrypt = require("bcrypt")
 const { v4: uuidv4 } = require("uuid")
 const jwt = require("jsonwebtoken");
 const { user, ownerEmailverification } = require("../models/users");
-const { mail } = require("../helper/mail/mail");
-const {idToToken, userToToken, verifyId} = require("../helper/token/token");
+const { register_mail, register_greet, verify_greet } = require("../helper/mail/mail");
+const { idToToken, userToToken, verifyId } = require("../helper/token/token");
 require('dotenv').config()
 
 
@@ -37,8 +37,8 @@ async function user_login(req, res) {
                 if (check_password) {
 
                     // create token of user credentials
-                    const token=userToToken(isUser[0])
-                
+                    const token = userToToken(isUser[0])
+
                     // sending token in cookies
                     res.cookie('token', token, { httpOnly: true, secure: false })
 
@@ -166,7 +166,7 @@ async function user_regiser(req, res) {
                         let hashedOtp = await bcrypt.hash(otp, salt)
 
                         // sending email
-                        const result = await mail(isUser[0].email, isUser[0].name, otp)
+                        const result = await register_mail(isUser[0].email, isUser[0].name, otp)
 
                         if (result) {
                             let newEmailVerify = await ownerEmailverification({
@@ -180,7 +180,7 @@ async function user_regiser(req, res) {
                             await newEmailVerify.save();
 
                             // creating token
-                            const token=idToToken(isUser[0]._id)
+                            const token = idToToken(isUser[0]._id)
 
                             res.json({
                                 status: "success",
@@ -222,7 +222,7 @@ async function user_regiser(req, res) {
                     let hashedOtp = await bcrypt.hash(otp, salt)
 
                     // sending email
-                    const result = await mail(isUser[0].email, isUser[0].name, otp)
+                    const result = await register_mail(isUser[0].email, isUser[0].name, otp)
 
                     if (result) {
                         let newEmailVerify = await ownerEmailverification({
@@ -235,8 +235,8 @@ async function user_regiser(req, res) {
                         // sending otp to new user and saving new hashed otp value in database
                         await newEmailVerify.save();
 
-                         // creating token
-                         const token=idToToken(isUser[0]._id)
+                        // creating token
+                        const token = idToToken(isUser[0]._id)
 
                         res.json({
                             status: "success",
@@ -283,7 +283,7 @@ async function user_regiser(req, res) {
 
 
             // email sent for verification
-            const result = await mail(email, name, otp)
+            const result = await register_mail(email, name, otp)
 
             if (result) {
 
@@ -307,8 +307,11 @@ async function user_regiser(req, res) {
                 //sending otp to new user and saving new hash ot p value in database
                 await newEmailVerify.save();
 
-                 // creating token
-                 const token=idToToken(userData._id)
+                // creating token
+                const token = idToToken(userData._id)
+
+                //sending greet massage
+                await register_greet(name, email)
 
                 res.json({
                     status: "success",
@@ -341,8 +344,8 @@ async function email_varification(req, res) {
     const otp = req.body.otp
     try {
 
-        const tokenData=await verifyId(token)
-        
+        const tokenData = await verifyId(token)
+
         const isUser = await ownerEmailverification.find({ owner: tokenData.user })
 
         if (isUser.length) {
@@ -366,6 +369,10 @@ async function email_varification(req, res) {
 
                     // delete otp document from model
                     await ownerEmailverification.findOneAndDelete({ owner: tokenData.user })
+
+                    //sending greet massage 
+                    console.log(update)
+                    await verify_greet(update.name, update.email)
 
                     res.json({
                         status: "success",

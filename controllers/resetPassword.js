@@ -1,4 +1,4 @@
-const {reset_password_mail}=require("../helper/mail/mail");
+const {reset_password_mail, password_updated}=require("../helper/mail/mail");
 const {user,passwordEmailverification}=require("../models/users")
 const { v4: uuidv4 } = require("uuid")
 const bcrypt=require("bcrypt")
@@ -250,6 +250,10 @@ if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password)) {
     const tokenData=await verifyId(token)
     const responce=await user.findByIdAndUpdate({_id:tokenData.user},{$set:{password:hashedPassword}},{new:true})
     if(responce){
+
+        // sending password updated successfullt mail
+        await password_updated(responce.name,responce.email);
+
         res.json({
             status: "success",
             message: "password update successfull."
