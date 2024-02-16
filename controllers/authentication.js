@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require("uuid")
 const jwt = require("jsonwebtoken");
 const { user, ownerEmailverification } = require("../models/users");
 const { register_mail, register_greet, verify_greet } = require("../helper/mail/mail");
-const { idToToken, userToToken, verifyId } = require("../helper/token/token");
+const {idToToken, userToToken, verifyId} = require("../helper/token/token");
 require('dotenv').config()
 
 
@@ -37,8 +37,8 @@ async function user_login(req, res) {
                 if (check_password) {
 
                     // create token of user credentials
-                    const token = userToToken(isUser[0])
-
+                    const token=userToToken(isUser[0])
+                
                     // sending token in cookies
                     res.cookie('token', token, { httpOnly: true, secure: false })
 
@@ -95,13 +95,15 @@ async function user_login(req, res) {
 
 async function user_regiser(req, res) {
 
-    let { name, email, password } = req.body;
+    let { name, email, password, phone } = req.body;
 
     name = name.trim();
     email = email.trim();
     password = password.trim();
+    phone=phone.trim()
 
-    if (name == "" || email == "" || password == "") {
+
+    if (name == "" || email == "" || password == ""|| phone == "") {
 
         res.json({
             status: "error",
@@ -111,7 +113,8 @@ async function user_regiser(req, res) {
             }
         })
 
-    } else if (!/^[a-zA-Z ]*$/.test(name)) {
+    } 
+    else if (!/^[a-zA-Z ]*$/.test(name)) {
 
         res.json({
             status: "error",
@@ -140,6 +143,16 @@ async function user_regiser(req, res) {
                 message: "Invalid password format"
             }
         })
+    }else if(phone.length<10 || phone.length>10){
+
+        res.json({
+            status: "error",
+            error: {
+                code: "400",
+                message: "Invalid phone format"
+            }
+        })
+
     } else {
 
         //send to database
@@ -180,7 +193,7 @@ async function user_regiser(req, res) {
                             await newEmailVerify.save();
 
                             // creating token
-                            const token = idToToken(isUser[0]._id)
+                            const token=idToToken(isUser[0]._id)
 
                             res.json({
                                 status: "success",
@@ -235,8 +248,8 @@ async function user_regiser(req, res) {
                         // sending otp to new user and saving new hashed otp value in database
                         await newEmailVerify.save();
 
-                        // creating token
-                        const token = idToToken(isUser[0]._id)
+                         // creating token
+                         const token=idToToken(isUser[0]._id)
 
                         res.json({
                             status: "success",
@@ -307,11 +320,11 @@ async function user_regiser(req, res) {
                 //sending otp to new user and saving new hash ot p value in database
                 await newEmailVerify.save();
 
-                // creating token
-                const token = idToToken(userData._id)
+                 // creating token
+                 const token=idToToken(userData._id)
 
-                //sending greet massage
-                await register_greet(name, email)
+                 //sending greet massage
+                await register_greet(name,email)
 
                 res.json({
                     status: "success",
@@ -344,8 +357,8 @@ async function email_varification(req, res) {
     const otp = req.body.otp
     try {
 
-        const tokenData = await verifyId(token)
-
+        const tokenData=await verifyId(token)
+        
         const isUser = await ownerEmailverification.find({ owner: tokenData.user })
 
         if (isUser.length) {
@@ -371,8 +384,8 @@ async function email_varification(req, res) {
                     await ownerEmailverification.findOneAndDelete({ owner: tokenData.user })
 
                     //sending greet massage 
-                    console.log(update)
-                    await verify_greet(update.name, update.email)
+                     console.log(update)
+                     await verify_greet(update.name,update.email)
 
                     res.json({
                         status: "success",
