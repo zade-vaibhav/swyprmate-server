@@ -13,16 +13,16 @@ router.post("/login",user_login)
 router.post("/register",user_regiser)
 
 //email verification
-router.post("/verification/:token",email_varification)
+router.post("/verification",email_varification)
 
 //password change otp 
 router.post("/password/password_reset_verify",reset_password_otp)
 
 //password otp verify
-router.post("/password/verify/:token",password_verification)
+router.post("/password/verify",password_verification)
 
 //password change
-router.post("/password/update_password/:token",updatePassword)
+router.post("/password/update_password",updatePassword)
 
 
 

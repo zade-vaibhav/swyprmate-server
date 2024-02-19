@@ -153,7 +153,7 @@ async function reset_password_otp(req,res){
 // password_verification 
 
 async function password_verification(req,res){
-    const { token } = req.params
+    const token=req.headers.authorization.split(" ")[1]
     const otp = req.body.otp
     try {
         // verify token
@@ -227,8 +227,8 @@ async function password_verification(req,res){
 // update password
 
 async function updatePassword(req,res){
-    const { token } = req.params
-let password =req.body.password;
+    const token=req.headers.authorization.split(" ")[1]
+    let password =req.body.password;
 
 
 if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password)) {
