@@ -196,28 +196,25 @@ const password_updated = async (name,email) => {
         to: `${email}`,
         subject: "Swypemate",
         text: "",
-        html: `<body style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2; margin: 0; padding: 0;">
-
-        <div style="margin: 50px auto; width: 70%; padding: 20px 0; border-bottom: 1px solid #eee;">
-          <a href="#" style="font-size: 1.4em; color: #00466a; text-decoration: none; font-weight: 600;">SWYPEMATE</a>
-        </div>
-        
-        <div style="margin: 50px auto; width: 70%; padding: 20px 0;">
-          <p style="font-size: 1.1em;">Hi, ${name},</p>
-          <p>Your email has been successfully updated with Swypemate.</p>
-          <p>If you did not make this change, please contact our support team immediately.</p>
-          <p style="font-size: 0.9em;">Regards,<br />Swypemate Team</p>
-        </div>
-        
-        <div style="margin: 50px auto; width: 70%; padding: 20px 0; border-top: 1px solid #eee;">
-          <div style="float: right; padding: 8px 0; color: #aaa; font-size: 0.8em; line-height: 1; font-weight: 300;">
+        html: `<div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2">
+        <div style="margin: 50px auto; width: 70%; padding: 20px 0">
+          <div style="border-bottom: 1px solid #eee">
+            <a href="" style="font-size: 1.4em; color: #00466a; text-decoration: none; font-weight: 600">SWYPEMATE</a>
+          </div>
+          <p style="font-size: 1.1em">Hi, ${name}</p>
+          <p>Your Swypemate account password has been successfully updated. If you didn't make this change, please contact us immediately.</p>
+          <h2 style="background: #00466a; margin: 0 auto; width: max-content; padding: 0 10px; color: #fff; border-radius: 4px;">Password Updated</h2>
+          <p style="font-size: 0.9em;">If you have any questions or concerns, feel free to reach out to our support team.</p>
+          <p style="font-size: 0.9em;">Regards,<br />Swypemate</p>
+          <hr style="border: none; border-top: 1px solid #eee" />
+          <div style="float: right; padding: 8px 0; color: #aaa; font-size: 0.8em; line-height: 1; font-weight: 300">
             <p>Brand Inc</p>
             <p>1600 Amphitheatre Parkway</p>
             <p>California</p>
           </div>
         </div>
-        
-        </body>`
+      </div>
+      `
     }
 
     return await transporter.sendMail(mailOption)
