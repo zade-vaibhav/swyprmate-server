@@ -428,9 +428,52 @@ async function email_varification(req, res) {
 
 }
 
+// userData
+
+async function userData(req,res){
+    const token = req.headers.authorization.split(" ")[1]
+
+try{
+
+    const tokenData = await verifyUser(token)
+
+    if(tokenData){
+        res.json({
+            status: "success",
+            data: {
+              user: {
+                name:tokenData.user.name,
+                email:tokenData.user.email
+              } 
+            }
+          }
+          )
+    }else{
+
+        res.json({
+            status: "error",
+            error: {
+                code: "400",
+                message: "invalid token!"
+            }
+        })
+    }
+
+
+}catch(err){
+    res.json({
+        status: "error",
+        error: {
+            code: "400",
+            message: "invalid token!"
+        }
+    })
+}
+
+}
 
 
 
 
 
-module.exports = { user_regiser, user_login, email_varification }
+module.exports = { user_regiser, user_login, email_varification,userData}

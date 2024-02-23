@@ -1,5 +1,5 @@
 const express = require("express");
-const { user_login, user_regiser, email_varification } = require("../../controllers/authentication");
+const { user_login, user_regiser, email_varification, userData } = require("../../controllers/authentication");
 const {reset_password_otp,password_verification, updatePassword} = require("../../controllers/resetPassword");
 const router = express.Router();
 const {user}=require("../../models/users")
@@ -24,6 +24,8 @@ router.post("/password/verify",password_verification)
 //password change
 router.post("/password/update_password",updatePassword)
 
+//userData
+router.get("/userData", userData)
 
 
 module.exports = router;
