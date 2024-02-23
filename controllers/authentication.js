@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require("uuid")
 const jwt = require("jsonwebtoken");
 const { user, ownerEmailverification } = require("../models/users");
 const { register_mail, register_greet, verify_greet } = require("../helper/mail/mail");
-const {idToToken, userToToken, verifyId} = require("../helper/token/token");
+const {idToToken, userToToken, verifyId, verifyUser} = require("../helper/token/token");
 require('dotenv').config()
 
 
@@ -454,7 +454,7 @@ try{
             status: "error",
             error: {
                 code: "400",
-                message: "invalid token!"
+                message: "invalid token!!"
             }
         })
     }
