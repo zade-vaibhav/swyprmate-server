@@ -473,7 +473,56 @@ try{
 }
 
 
+// checking user is already login and token is not ecpired
+
+async function checkLogin(req,res){
+    const token = req.headers.authorization.split(" ")[1]
+    
+    try {
+        // Decode the token without verifying the signature
+        const decodedToken= jwt.decode(token,{complete:true})    
+    if (decodedToken && decodedToken.payload.exp) {
+        const expirationTimestamp = decodedToken.payload.exp;
+        const currentTimestamp = Math.floor(Date.now() / 1000); // Convert milliseconds to seconds
+    
+        if (currentTimestamp < expirationTimestamp) {
+            res.json({
+                status: "success",
+                massage: "Token is not expired."
+            })
+        } else {
+            res.json({
+                status: "error",
+                error: {
+                    code: "400",
+                    message: 'Token has expired.'
+                }
+            })
+        }
+      } else {
+        res.json({
+            status: "error",
+            error: {
+                code: "400",
+                message: 'Invalid token or missing expiration claim.'
+            }
+        })
+      }
+    } catch (error) {
+     
+        res.json({
+            status: "error",
+            error: {
+                code: "400",
+                message:err
+            }
+        })
+    }
+}
 
 
 
-module.exports = { user_regiser, user_login, email_varification,userData}
+
+
+
+module.exports = { user_regiser, user_login, email_varification,userData,checkLogin}

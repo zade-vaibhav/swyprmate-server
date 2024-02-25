@@ -1,5 +1,5 @@
 const express = require("express");
-const { user_login, user_regiser, email_varification, userData } = require("../../controllers/authentication");
+const { user_login, user_regiser, email_varification, userData, checkLogin } = require("../../controllers/authentication");
 const {reset_password_otp,password_verification, updatePassword} = require("../../controllers/resetPassword");
 const router = express.Router();
 const {user}=require("../../models/users")
@@ -27,5 +27,7 @@ router.post("/password/update_password",updatePassword)
 //userData
 router.get("/userData", userData)
 
+// check-login
+router.get("/check-login",checkLogin)
 
 module.exports = router;
