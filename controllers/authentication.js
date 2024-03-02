@@ -45,7 +45,9 @@ async function user_login(req, res) {
                     res.json({
                         status: "success",
                         user: {
-                            token: token
+                            token: token,
+                            name:isUser[0].name,
+                            email:isUser[0].email
                         },
                         message: "Login successfull."
                     })
