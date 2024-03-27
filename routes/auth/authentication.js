@@ -10,7 +10,7 @@ const  {adharData}  = require("../../controllers/adharDataController");
 router.post("/login", user_login)
 
 //registration
-router.post("/register", user_regiser)
+router.post("/register", user_regiser) 
 
 //email verification
 router.post("/verification", email_varification)

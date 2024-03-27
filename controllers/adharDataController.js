@@ -4,7 +4,6 @@ const { user } = require("../models/users");
  async function adharData(req,res){
     const {email,adharData}=req.body
     try{
-
    const data=await user.findOne({email})
     if(!data){
         return res.status(404).json({success:false,message:"user not found"})

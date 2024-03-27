@@ -12,6 +12,23 @@ const userScheme=new mongoose.Schema({
         type:Boolean,
         default:false
     },
+    kyc:{
+
+        aadhar:{
+           aadhar_data:mongoose.Schema.Types.Mixed,
+           Validity_status:{
+            type:Boolean,
+            default:false
+         }
+        },
+        pan:{
+            pan_data:mongoose.Schema.Types.Mixed,
+            Validity_status:{
+             type:Boolean,
+             default:false
+          }
+        }
+    }
 
 })
 
