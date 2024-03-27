@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require("uuid")
 const jwt = require("jsonwebtoken");
 const { user, ownerEmailverification } = require("../models/users");
 const { register_mail, register_greet, verify_greet } = require("../helper/mail/mail");
-const {idToToken, userToToken, verifyId, verifyUser} = require("../helper/token/token");
+const { idToToken, userToToken, verifyId, verifyUser } = require("../helper/token/token");
 require('dotenv').config()
 
 
@@ -37,8 +37,8 @@ async function user_login(req, res) {
                 if (check_password) {
 
                     // create token of user credentials
-                    const token=userToToken(isUser[0])
-                
+                    const token = userToToken(isUser[0])
+
                     // sending token in cookies
                     res.cookie('token', token, { httpOnly: true, secure: false })
 
@@ -102,10 +102,10 @@ async function user_regiser(req, res) {
     name = name.trim();
     email = email.trim();
     password = password.trim();
-    phone=phone.trim()
+    phone = phone.trim()
 
 
-    if (name == "" || email == "" || password == ""|| phone == "") {
+    if (name == "" || email == "" || password == "" || phone == "") {
 
         res.json({
             status: "error",
@@ -115,7 +115,7 @@ async function user_regiser(req, res) {
             }
         })
 
-    } 
+    }
     else if (!/^[a-zA-Z ]*$/.test(name)) {
 
         res.json({
@@ -145,7 +145,7 @@ async function user_regiser(req, res) {
                 message: "Invalid password format"
             }
         })
-    }else if(phone.length<10 || phone.length>10){
+    } else if (phone.length < 10 || phone.length > 10) {
 
         res.json({
             status: "error",
@@ -195,7 +195,7 @@ async function user_regiser(req, res) {
                             await newEmailVerify.save();
 
                             // creating token
-                            const token=idToToken(isUser[0]._id)
+                            const token = idToToken(isUser[0]._id)
 
                             res.json({
                                 status: "success",
@@ -250,8 +250,8 @@ async function user_regiser(req, res) {
                         // sending otp to new user and saving new hashed otp value in database
                         await newEmailVerify.save();
 
-                         // creating token
-                         const token=idToToken(isUser[0]._id)
+                        // creating token
+                        const token = idToToken(isUser[0]._id)
 
                         res.json({
                             status: "success",
@@ -322,11 +322,11 @@ async function user_regiser(req, res) {
                 //sending otp to new user and saving new hash ot p value in database
                 await newEmailVerify.save();
 
-                 // creating token
-                 const token=idToToken(userData._id)
+                // creating token
+                const token = idToToken(userData._id)
 
-                 //sending greet massage
-                await register_greet(name,email)
+                //sending greet massage
+                await register_greet(name, email)
 
                 res.json({
                     status: "success",
@@ -355,12 +355,12 @@ async function user_regiser(req, res) {
 }
 
 async function email_varification(req, res) {
-    const token=req.headers.authorization.split(" ")[1]
+    const token = req.headers.authorization.split(" ")[1]
     const otp = req.body.otp
     try {
 
-        const tokenData=await verifyId(token)
-        
+        const tokenData = await verifyId(token)
+
         const isUser = await ownerEmailverification.find({ owner: tokenData.user })
 
         if (isUser.length) {
@@ -386,8 +386,8 @@ async function email_varification(req, res) {
                     await ownerEmailverification.findOneAndDelete({ owner: tokenData.user })
 
                     //sending greet massage 
-                     console.log(update)
-                     await verify_greet(update.name,update.email)
+                    console.log(update)
+                    // await verify_greet(update.name, update.email)
 
                     res.json({
                         status: "success",
@@ -418,6 +418,7 @@ async function email_varification(req, res) {
             })
         }
     } catch (err) {
+        console.log(err);
         res.json({
             status: "error",
             error: {
@@ -430,15 +431,16 @@ async function email_varification(req, res) {
 
 }
 
+
 // userData
 
 async function userData(req,res){
     const token = req.headers.authorization.split(" ")[1]
-
+    console.log(token)
 try{
 
     const tokenData = await verifyUser(token)
-
+    console.log(tokenData)
     if(tokenData){
         res.json({
             status: "success",
@@ -456,7 +458,7 @@ try{
             status: "error",
             error: {
                 code: "400",
-                message: "invalid token!!"
+                message: "invalid token!"
             }
         })
     }
@@ -525,6 +527,4 @@ async function checkLogin(req,res){
 
 
 
-
-
-module.exports = { user_regiser, user_login, email_varification,userData,checkLogin}
+module.exports = { user_regiser, user_login, email_varification,userData,checkLogin} 
