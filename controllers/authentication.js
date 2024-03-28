@@ -32,10 +32,9 @@ async function user_login(req, res) {
         if (isUser) {
 
             const check_password = await bcrypt.compare(password, isUser.password)
-
+           
             if (isUser.email == email) {
                 if (check_password) {
-
                     // create token of user credentials
                     const token = userToToken({
                         name:isUser.name,
@@ -43,6 +42,7 @@ async function user_login(req, res) {
                         aadhar_validity:isUser.kyc.aadhar.Validity_status,
                         pan_validity:isUser.kyc.pan.Validity_status
                     })
+
 
                     // sending token in cookies
                     // res.cookie('token', token, { httpOnly: true, secure: false })
@@ -445,14 +445,17 @@ async function userData(req,res){
 try{
 
     const tokenData = await verifyUser(token)
-    console.log(tokenData)
+    
     if(tokenData){
+       
         res.json({
             status: "success",
             data: {
               user: {
                 name:tokenData.user.name,
-                email:tokenData.user.email
+                email:tokenData.user.email,
+                aadhar_validity:tokenData.user.aadhar_validity,
+                pan_validity:tokenData.user.aadhar_validity
               } 
             }
           }
