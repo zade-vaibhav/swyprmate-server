@@ -28,7 +28,7 @@ async function user_login(req, res) {
     } else {
 
         const isUser = await user.findOne({ email });
-
+        
         if (isUser) {
 
             const check_password = await bcrypt.compare(password, isUser.password)
@@ -37,11 +37,16 @@ async function user_login(req, res) {
                 if (check_password) {
 
                     // create token of user credentials
-                    const token = userToToken({name:isUser.name,email:isUser.email})
+                    const token = userToToken({
+                        name:isUser.name,
+                        email:isUser.email,
+                        aadhar_validity:isUser.kyc.aadhar.Validity_status,
+                        pan_validity:isUser.kyc.pan.Validity_status
+                    })
 
                     // sending token in cookies
                     // res.cookie('token', token, { httpOnly: true, secure: false })
-             
+                console.log(isUser)
                     res.json({
                         status: "success",
                         user: {
