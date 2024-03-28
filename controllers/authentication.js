@@ -455,8 +455,8 @@ try{
                 name:tokenData.user.name,
                 email:tokenData.user.email,
                 aadhar_validity:tokenData.user.aadhar_validity,
-                pan_validity:tokenData.user.aadhar_validity
-              } 
+                pan_validity:tokenData.user.pan_validity              
+            } 
             }
           }
           )
