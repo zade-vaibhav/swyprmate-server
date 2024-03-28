@@ -27,27 +27,27 @@ async function user_login(req, res) {
         )
     } else {
 
-        const isUser = await user.find({ email });
+        const isUser = await user.findOne({ email });
 
-        if (isUser.length) {
+        if (isUser) {
 
-            const check_password = await bcrypt.compare(password, isUser[0].password)
+            const check_password = await bcrypt.compare(password, isUser.password)
 
-            if (isUser[0].email == email) {
+            if (isUser.email == email) {
                 if (check_password) {
 
                     // create token of user credentials
-                    const token = userToToken(isUser[0])
+                    const token = userToToken({name:isUser.name,email:isUser.email})
 
                     // sending token in cookies
-                    res.cookie('token', token, { httpOnly: true, secure: false })
-
+                    // res.cookie('token', token, { httpOnly: true, secure: false })
+             
                     res.json({
                         status: "success",
                         user: {
                             token: token,
-                            name:isUser[0].name,
-                            email:isUser[0].email
+                            name:isUser.name,
+                            email:isUser.email
                         },
                         message: "Login successfull."
                     })
