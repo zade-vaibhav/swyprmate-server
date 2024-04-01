@@ -6,6 +6,7 @@ const userScheme=new mongoose.Schema({
     name:String,
     email:String,
     password:String,
+    refresh_token:String,
     date_created:String,
     phone:String,
     is_varified:{
