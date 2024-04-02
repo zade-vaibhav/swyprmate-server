@@ -453,17 +453,14 @@ async function userData(req, res) {
     try {
 
         const tokenData = await verifyUser(token)
-
+        console.log(tokenData)
         if (tokenData) {
 
             res.json({
                 status: "success",
                 data: {
                     user: {
-                        name: tokenData.user.name,
-                        email: tokenData.user.email,
-                        aadhar_validity: tokenData.user.aadhar_validity,
-                        pan_validity: tokenData.user.pan_validity
+                        id:tokenData.user.id
                     }
                 }
             }
