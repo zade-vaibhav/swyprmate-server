@@ -1,5 +1,5 @@
 const express = require("express");
-const { user_login, user_regiser, email_varification, userData, checkLogin, refreshData } = require("../../controllers/authentication");
+const { user_login, user_regiser, email_varification, userData, checkLogin, refreshData, newTokens } = require("../../controllers/authentication");
 const { reset_password_otp, password_verification, updatePassword } = require("../../controllers/resetPassword");
 const router = express.Router();
 const { user } = require("../../models/users");
@@ -39,6 +39,9 @@ router.post("/user",userdata)
 
 //save adhar data
 router.post("/adhar-verify",adharData)
+
+// creating new tokens
+router.post("/tokens/new",newTokens)
 
 
 

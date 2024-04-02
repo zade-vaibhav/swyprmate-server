@@ -581,8 +581,63 @@ async function checkLogin(req, res) {
 }
 
 
+async function newTokens(req, res) {
+    const {id}=req.body
+   
+    try {
+
+       const isUser=await user.findOne({_id:id});
+
+       if(!isUser){
+        res.status(404).json({
+            status: "error",
+            error: {
+                code: "400",
+                message: "invalid user!"
+            }
+        })
+        return;
+       }
+
+          //accesstoken
+          const access_token = await idToToken({id:isUser._id})
+          // sending access-token in cookies
+          // res.cookie('access_token', access_token, { httpOnly: true, secure: false })
+
+          //accesstoken
+          const refresh_token = await refreshToken({id:isUser._id})
+          // sending access-token in cookies
+          // res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false })
+          
+
+          //saving refresh token to database
+          isUser.refresh_token=refresh_token;
+
+          await isUser.save();
+          
+          res.status(201).json({
+            status: "success",
+            user: {
+                access_token: access_token,
+                refresh_token: refresh_token,
+                data:isUser
+            },
+            message: "Login successfull."
+        })
+
+    } catch (err) {
+        res.json({
+            status: "error",
+            error: {
+                code: "400",
+                message: "server error!!"
+            }
+        })
+    }
+
+}
 
 
 
 
-module.exports = { user_regiser, user_login, email_varification,refreshData, userData, checkLogin }; 
+module.exports = { user_regiser, user_login, email_varification,refreshData, userData, checkLogin,newTokens }; 
