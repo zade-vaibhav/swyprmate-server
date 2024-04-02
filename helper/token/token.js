@@ -27,5 +27,10 @@ const verifyUser=(token)=>{
     return tokenData;
 }
 
+const verifyRefresh=(token)=>{
+    const tokenData = jwt.verify(token, process.env.REFRESH_KEY);
+    return tokenData;
+}
 
-module.exports={idToToken,userToToken,verifyId,verifyUser,refreshToken};
+
+module.exports={idToToken,userToToken,verifyId,verifyUser,refreshToken,verifyRefresh};

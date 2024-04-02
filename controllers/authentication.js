@@ -35,23 +35,21 @@ async function user_login(req, res) {
 
             if (isUser.email == email) {
                 if (check_password) {
-                
-                  //accesstoken
-                  const access_token = await idToToken({id:isUser._id})
-                  // sending access-token in cookies
-                  // res.cookie('access_token', access_token, { httpOnly: true, secure: false })
+                    //accesstoken
+                    const access_token = await idToToken({id:isUser._id})
+                    // sending access-token in cookies
+                    // res.cookie('access_token', access_token, { httpOnly: true, secure: false })
 
-                  //accesstoken
-                  const refresh_token = await refreshToken({id:isUser._id})
-                  // sending access-token in cookies
-                  // res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false })
-
+                    //accesstoken
+                    const refresh_token = await refreshToken({id:isUser._id})
+                    // sending access-token in cookies
+                    // res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false })
+                    
 
                     //saving refresh token to database
                     isUser.refresh_token=refresh_token;
 
                     await isUser.save();
-                    
                     
                     res.json({
                         status: "success",
@@ -398,7 +396,7 @@ async function email_varification(req, res) {
                     await ownerEmailverification.findOneAndDelete({ owner: tokenData.user })
 
                     //sending greet massage 
-                    console.log(update)
+                   
                     // await verify_greet(update.name, update.email)
 
                     res.json({
@@ -430,7 +428,7 @@ async function email_varification(req, res) {
             })
         }
     } catch (err) {
-        console.log(err);
+       
         res.json({
             status: "error",
             error: {
@@ -448,11 +446,11 @@ async function email_varification(req, res) {
 
 async function userData(req, res) {
     const token = req.headers.authorization.split(" ")[1]
-    console.log(token,"vaibhav")
+   
     try {
 
         const tokenData = await verifyUser(token)
-        console.log(tokenData)
+        
         if (tokenData) {
 
             res.json({
@@ -487,6 +485,52 @@ async function userData(req, res) {
     }
 
 }
+
+// refresh data
+
+async function refreshData(req, res) {
+    const token = req.headers.authorization.split(" ")[1]
+   
+    try {
+
+        const tokenData = await verifyRefresh(token)
+        
+        if (tokenData) {
+
+            res.json({
+                status: "success",
+                data: {
+                    user: {
+                        id:tokenData.user.id
+                    }
+                }
+            }
+            )
+        } else {
+
+            res.json({
+                status: "error",
+                error: {
+                    code: "400",
+                    message: "invalid token!"
+                }
+            })
+        }
+
+
+    } catch (err) {
+        res.json({
+            status: "error",
+            error: {
+                code: "400",
+                message: "invalid token!"
+            }
+        })
+    }
+
+}
+
+
 
 
 // checking user is already login and token is not ecpired
@@ -541,4 +585,4 @@ async function checkLogin(req, res) {
 
 
 
-module.exports = { user_regiser, user_login, email_varification, userData, checkLogin }; 
+module.exports = { user_regiser, user_login, email_varification,refreshData, userData, checkLogin }; 

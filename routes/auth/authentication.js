@@ -1,5 +1,5 @@
 const express = require("express");
-const { user_login, user_regiser, email_varification, userData, checkLogin } = require("../../controllers/authentication");
+const { user_login, user_regiser, email_varification, userData, checkLogin, refreshData } = require("../../controllers/authentication");
 const { reset_password_otp, password_verification, updatePassword } = require("../../controllers/resetPassword");
 const router = express.Router();
 const { user } = require("../../models/users");
@@ -27,6 +27,9 @@ router.post("/password/update_password", updatePassword)
 
 //userData by token
 router.get("/userData", userData)
+
+//refresh token data
+router.get("/refreshToken/data", refreshData)
 
 // check-login by token expiry
 router.get("/check-login",checkLogin)
