@@ -48,7 +48,7 @@ async function user_login(req, res) {
 
 
                     //saving refresh token to database
-                    isUser.refresh_token=refreshToken;
+                    isUser.refresh_token=refresh_token;
 
                     await isUser.save();
                     
