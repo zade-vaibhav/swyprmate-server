@@ -35,21 +35,14 @@ async function user_login(req, res) {
 
             if (isUser.email == email) {
                 if (check_password) {
-                    // create token of user credentials
-                    const token = userToToken({
-                        name: isUser.name,
-                        email: isUser.email,
-                        aadhar_validity: isUser.kyc.aadhar.Validity_status,
-                        pan_validity: isUser.kyc.pan.Validity_status
-                    })
-
+                
                     //accesstoken
-                    const access_token = await idToToken(user._id)
+                    const access_token = await idToToken(isUser._id)
                     // sending access-token in cookies
                     // res.cookie('access_token', access_token, { httpOnly: true, secure: false })
 
                     //accesstoken
-                    const refresh_token = await refreshToken(user._id)
+                    const refresh_token = await refreshToken(isUser._id)
                     // sending access-token in cookies
                     // res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false })
 
@@ -449,7 +442,7 @@ async function email_varification(req, res) {
 
 async function userData(req, res) {
     const token = req.headers.authorization.split(" ")[1]
-    console.log(token)
+    console.log(token,"vaibhav")
     try {
 
         const tokenData = await verifyUser(token)
