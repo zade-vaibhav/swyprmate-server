@@ -36,15 +36,16 @@ async function user_login(req, res) {
             if (isUser.email == email) {
                 if (check_password) {
                 
-                    //accesstoken
-                    const access_token = await idToToken(isUser._id)
-                    // sending access-token in cookies
-                    // res.cookie('access_token', access_token, { httpOnly: true, secure: false })
+                  //accesstoken
+                  const access_token = await idToToken({id:isUser._id})
+                  // sending access-token in cookies
+                  // res.cookie('access_token', access_token, { httpOnly: true, secure: false })
 
-                    //accesstoken
-                    const refresh_token = await refreshToken(isUser._id)
-                    // sending access-token in cookies
-                    // res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false })
+                  //accesstoken
+                  const refresh_token = await refreshToken({id:isUser._id})
+                  // sending access-token in cookies
+                  // res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false })
+
 
                     
                     res.json({
