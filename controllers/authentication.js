@@ -47,6 +47,11 @@ async function user_login(req, res) {
                   // res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false })
 
 
+                    //saving refresh token to database
+                    isUser.refresh_token=refreshToken;
+
+                    await isUser.save();
+                    
                     
                     res.json({
                         status: "success",
