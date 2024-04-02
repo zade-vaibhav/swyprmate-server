@@ -28,39 +28,39 @@ async function user_login(req, res) {
     } else {
 
         const isUser = await user.findOne({ email });
-        
+
         if (isUser) {
 
             const check_password = await bcrypt.compare(password, isUser.password)
-           
+
             if (isUser.email == email) {
                 if (check_password) {
                     // create token of user credentials
                     const token = userToToken({
-                        name:isUser.name,
-                        email:isUser.email,
-                        aadhar_validity:isUser.kyc.aadhar.Validity_status,
-                        pan_validity:isUser.kyc.pan.Validity_status
+                        name: isUser.name,
+                        email: isUser.email,
+                        aadhar_validity: isUser.kyc.aadhar.Validity_status,
+                        pan_validity: isUser.kyc.pan.Validity_status
                     })
 
+                    //accesstoken
+                    const access_token = await idToToken(user._id)
+                    // sending access-token in cookies
+                    // res.cookie('access_token', access_token, { httpOnly: true, secure: false })
 
-                  //accesstoken
-                  const access_token = await idToToken(user._id)
-                  // sending access-token in cookies
-                  res.cookie('access_token', access_token, { httpOnly: true, secure: false })
+                    //accesstoken
+                    const refresh_token = await refreshToken(user._id)
+                    // sending access-token in cookies
+                    // res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false })
 
-                  //accesstoken
-                  const refresh_token = await refreshToken(user._id)
-                  // sending access-token in cookies
-                  res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false })
-
-                console.log(isUser)
+                    
                     res.json({
                         status: "success",
                         user: {
-                            token: token,
-                            name:isUser.name,
-                            email:isUser.email
+                            access_token: access_token,
+                            refresh_token: refresh_token,
+                            name: isUser.name,
+                            email: isUser.email
                         },
                         message: "Login successfull."
                     })
@@ -447,29 +447,40 @@ async function email_varification(req, res) {
 
 // userData
 
-async function userData(req,res){
+async function userData(req, res) {
     const token = req.headers.authorization.split(" ")[1]
     console.log(token)
-try{
+    try {
 
-    const tokenData = await verifyUser(token)
-    
-    if(tokenData){
-       
-        res.json({
-            status: "success",
-            data: {
-              user: {
-                name:tokenData.user.name,
-                email:tokenData.user.email,
-                aadhar_validity:tokenData.user.aadhar_validity,
-                pan_validity:tokenData.user.pan_validity              
-            } 
+        const tokenData = await verifyUser(token)
+
+        if (tokenData) {
+
+            res.json({
+                status: "success",
+                data: {
+                    user: {
+                        name: tokenData.user.name,
+                        email: tokenData.user.email,
+                        aadhar_validity: tokenData.user.aadhar_validity,
+                        pan_validity: tokenData.user.pan_validity
+                    }
+                }
             }
-          }
-          )
-    }else{
+            )
+        } else {
 
+            res.json({
+                status: "error",
+                error: {
+                    code: "400",
+                    message: "invalid token!"
+                }
+            })
+        }
+
+
+    } catch (err) {
         res.json({
             status: "error",
             error: {
@@ -479,62 +490,51 @@ try{
         })
     }
 
-
-}catch(err){
-    res.json({
-        status: "error",
-        error: {
-            code: "400",
-            message: "invalid token!"
-        }
-    })
-}
-
 }
 
 
 // checking user is already login and token is not ecpired
 
-async function checkLogin(req,res){
+async function checkLogin(req, res) {
     const token = req.headers.authorization.split(" ")[1]
-    
+
     try {
         // Decode the token without verifying the signature
-        const decodedToken= jwt.decode(token,{complete:true})    
-    if (decodedToken && decodedToken.payload.exp) {
-        const expirationTimestamp = decodedToken.payload.exp;
-        const currentTimestamp = Math.floor(Date.now() / 1000); // Convert milliseconds to seconds
-    
-        if (currentTimestamp < expirationTimestamp) {
-            res.json({
-                status: "success",
-                massage: "Token is not expired."
-            })
+        const decodedToken = jwt.decode(token, { complete: true })
+        if (decodedToken && decodedToken.payload.exp) {
+            const expirationTimestamp = decodedToken.payload.exp;
+            const currentTimestamp = Math.floor(Date.now() / 1000); // Convert milliseconds to seconds
+
+            if (currentTimestamp < expirationTimestamp) {
+                res.json({
+                    status: "success",
+                    massage: "Token is not expired."
+                })
+            } else {
+                res.json({
+                    status: "error",
+                    error: {
+                        code: "400",
+                        message: 'Token has expired.'
+                    }
+                })
+            }
         } else {
             res.json({
                 status: "error",
                 error: {
                     code: "400",
-                    message: 'Token has expired.'
+                    message: 'Invalid token or missing expiration claim.'
                 }
             })
         }
-      } else {
-        res.json({
-            status: "error",
-            error: {
-                code: "400",
-                message: 'Invalid token or missing expiration claim.'
-            }
-        })
-      }
     } catch (error) {
-     
+
         res.json({
             status: "error",
             error: {
                 code: "400",
-                message:err
+                message: err
             }
         })
     }
@@ -543,4 +543,6 @@ async function checkLogin(req,res){
 
 
 
-module.exports = { user_regiser, user_login, email_varification,userData,checkLogin} 
+
+
+module.exports = { user_regiser, user_login, email_varification, userData, checkLogin }; 
