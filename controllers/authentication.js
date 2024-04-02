@@ -582,60 +582,51 @@ async function checkLogin(req, res) {
 
 
 async function newTokens(req, res) {
-    const {id}=req.body
-   
+    const { id } = req.body;
+
     try {
+        const isUser = await user.findOne({ _id: id });
 
-       const isUser=await user.findOne({_id:id});
+        if (!isUser) {
+            return res.status(404).json({
+                status: "error",
+                error: {
+                    code: "400",
+                    message: "Invalid user!"
+                }
+            });
+        }
 
-       if(!isUser){
-        res.status(404).json({
-            status: "error",
-            error: {
-                code: "400",
-                message: "invalid user!"
-            }
-        })
-        return;
-       }
+        // Generate access token
+        const access_token = await idToToken({ id: isUser._id });
 
-          //accesstoken
-          const access_token = await idToToken({id:isUser._id})
-          // sending access-token in cookies
-          // res.cookie('access_token', access_token, { httpOnly: true, secure: false })
+        // Generate refresh token
+        const refresh_token = await refreshToken({ id: isUser._id });
 
-          //accesstoken
-          const refresh_token = await refreshToken({id:isUser._id})
-          // sending access-token in cookies
-          // res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false })
-          
+        // Save refresh token to the database
+        isUser.refresh_token = refresh_token;
+        await isUser.save();
 
-          //saving refresh token to database
-          isUser.refresh_token=refresh_token;
-
-          await isUser.save();
-          
-          res.status(201).json({
+        return res.status(201).json({
             status: "success",
             user: {
-                access_token: access_token,
-                refresh_token: refresh_token,
-                data:isUser
+                access_token,
+                refresh_token,
+                data: isUser
             },
-            message: "Login successfull."
-        })
-
+            message: "Login successful."
+        });
     } catch (err) {
-        res.json({
+        return res.status(500).json({
             status: "error",
             error: {
-                code: "400",
-                message: "server error!!"
+                code: "500",
+                message: "Server error!"
             }
-        })
+        });
     }
-
 }
+
 
 
 
