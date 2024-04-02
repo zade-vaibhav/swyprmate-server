@@ -3,7 +3,7 @@ require('dotenv').config()
 
 
 const idToToken=(id)=>{
-    const token = jwt.sign({ user: id }, process.env.SECTRT_KEY, { expiresIn: '1m' });
+    const token = jwt.sign({ user: id }, process.env.SECTRT_KEY, { expiresIn: '15m' });
     return token;
 }
 
@@ -13,7 +13,7 @@ const verifyId=(token)=>{
 }
 
 const userToToken=(id)=>{
-    const token = jwt.sign({ user: id }, process.env.SECTRT_KEY, { expiresIn: '1m' });
+    const token = jwt.sign({ user: id }, process.env.SECTRT_KEY, { expiresIn: '15m' });
     return token;
 }
 
