@@ -4,6 +4,7 @@ const { reset_password_otp, password_verification, updatePassword } = require(".
 const router = express.Router();
 const { user } = require("../../models/users");
 const  {adharData}  = require("../../controllers/adharDataController");
+const {userdata} = require("../../controllers/userData");
 
 
 //login
@@ -24,11 +25,14 @@ router.post("/password/verify", password_verification)
 //password change
 router.post("/password/update_password", updatePassword)
 
-//userData
+//userData by token
 router.get("/userData", userData)
 
-// check-login
+// check-login by token expiry
 router.get("/check-login",checkLogin)
+
+// getting user data by id
+router.post("/user",userdata)
 
 //save adhar data
 router.post("/adhar-verify",adharData)
