@@ -1,3 +1,5 @@
+const { user } = require("../models/users");
+
 async function panData(req,res){
     const {email,panData}=req.body
     try{
