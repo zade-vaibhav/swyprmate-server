@@ -5,6 +5,7 @@ const router = express.Router();
 const { user } = require("../../models/users");
 const  {adharData}  = require("../../controllers/adharDataController");
 const {userdata} = require("../../controllers/userData");
+const { panData } = require("../../controllers/panDataController");
 
 
 //login
@@ -39,6 +40,9 @@ router.post("/user",userdata)
 
 //save adhar data
 router.post("/adhar-verify",adharData)
+
+//save pan data
+router.post("/pan-verify",panData)
 
 // creating new tokens
 router.post("/tokens/new",newTokens)
