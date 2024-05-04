@@ -10,6 +10,7 @@ const { user } = require("../models/users");
     }
    data.kyc.aadhar.aadhar_data=adharData;
    data.kyc.aadhar.Validity_status=true;
+   data.name=adharData.full_name;
    data.save()
    return res.status(200).json({success:true,message:"user Updated successful!!",data})
     }
